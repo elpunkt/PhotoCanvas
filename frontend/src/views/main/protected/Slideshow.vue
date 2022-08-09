@@ -32,7 +32,7 @@ export default {
   methods: {
     connectWebSocket() {
       let that = this
-      that.socket = new WebSocket("ws://localhost:8000/new_photos")
+      that.socket = new WebSocket("ws://localhost:8000/ws/new_photos")
       that.socket.onmessage = function(e) {
         let data = JSON.parse(e.data)
         if (data.action === 'add') {
