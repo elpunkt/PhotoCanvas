@@ -10,6 +10,11 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER: str
     FIRST_SUPERUSER_PASSWORD: str
 
+    POSTGRES_DB: str = None
+    POSTGRES_SERVER: str = None
+    POSTGRES_PW: str = None
+    POSTGRES_USER: str = None
+
     MAX_IMG_WIDTH: int = 1080
     MAX_IMG_HEIGHT: int = 1080
     OPTIMIZE_IMGS: bool = True
