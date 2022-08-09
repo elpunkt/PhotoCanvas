@@ -21,7 +21,7 @@ app.include_router(websocket_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],
+    allow_origins=["http://localhost:8080", "https://maurer-rautenberg.de"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
