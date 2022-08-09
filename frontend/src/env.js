@@ -10,6 +10,5 @@ if (env === 'production') {
 } else {
   envApiUrl = `http://${process.env.VUE_APP_DOMAIN_DEV}${process.env.VUE_APP_API_PATH}`;
 }
-console.log(env);
 export const apiUrl = envApiUrl;
 export const appName = process.env.VUE_APP_NAME;
