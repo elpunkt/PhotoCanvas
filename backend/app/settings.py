@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     MAX_IMG_HEIGHT: int = 1080
     OPTIMIZE_IMGS: bool = True
     IMG_QUALITY: int = 90
+    IMG_SAVE_PATH: str
 
     class Config:
         env_file = ".env"

@@ -22,7 +22,7 @@ api_router = APIRouter()
 async def process_image(img, title, db):
     img_name = f"{math.floor(time.time())}_{random.randint(10000,99999)}.{img.format}"
     img.thumbnail((settings.MAX_IMG_WIDTH, settings.MAX_IMG_HEIGHT))
-    img.save(f"frontend/public/uploaded/{img_name}",
+    img.save(f"{settings.IMAGE_SAVE_PATH}{img_name}",
              quality=settings.IMG_QUALITY,
              optimize=settings.OPTIMIZE_IMGS)
     photo_meta = {"title":title, "filename": img_name, "upload_date": time.time()}
