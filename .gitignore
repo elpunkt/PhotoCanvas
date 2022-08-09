@@ -2,6 +2,7 @@ venv/
 .env
 database.db
 frontend/public/uploaded/*
+frontend/dist/uploaded/*
 
 .DS_Store
 node_modules
@@ -39,7 +40,6 @@ __pycache__/
 bin/
 build/
 develop-eggs/
-dist/
 eggs/
 lib/
 lib64/
