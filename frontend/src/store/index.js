@@ -69,12 +69,11 @@ const store = createStore({
     },
     async logOut(context) {
       removeLocalToken();
+      context.commit('setUserProfile', null)
       context.commit('setToken', '');
       context.commit('setLoggedIn', false);
       context.commit('addNotification', { content: 'Ausgeloggt', color: 'success' })
-      if (router.currentRoute.path !== '/login') {
-          router.push({name: 'Login'});
-      }
+      router.push({name: 'Home'});
     },
     async checkLoggedIn(context) {
       if (!context.state.isLoggedIn) {

@@ -7,7 +7,7 @@
         <!-- <input type="text" v-model="title" placeholder="Titel/Beschreibung (optional)"><br> -->
         <button id="upload-button"
                 @click="uploadPhoto"
-                :disabled="!selectedFile"><span><span v-if="!selectedFile">&#x1F6A7; </span><span>und ab dafür!</span><span v-if="selectedFile">&#x1F470;❤️&#x1F935;</span><span v-else> &#x1F6A7;</span></span></button>
+                :disabled="!selectedFile"><span><span v-if="!selectedFile">&#x1F6A7;---&#x1F6A7;---&#x1F6A7;</span><span v-else><span>und ab dafür!</span> &#x1F470;❤️&#x1F935;</span></span></button>
         {{fileSelected}}
       </div>
     </div>
@@ -73,6 +73,7 @@ export default {
 input[type="file"] {
     display: none;
 }
+$buttoncol: white;
 
 .file-upload-label {
     border: 1px solid #ccc;
@@ -85,9 +86,11 @@ input[type="file"] {
     align-content: center;
     flex-direction: column;
     font-size: 2em;
+    &:hover {
+      background-color: lighten(green,50)
+    }
 }
 
-$buttoncol: white;
 #upload-button {
   background-color: $buttoncol;
   cursor: pointer;
@@ -103,9 +106,10 @@ $buttoncol: white;
   font-size: 2em;
   &:disabled {
     cursor:not-allowed;
+    background-color: darken($buttoncol,10);
   }
   &:hover {
-    background-color: darken($buttoncol,10)
+    background-color: darken($buttoncol,10);
   }
 }
 </style>

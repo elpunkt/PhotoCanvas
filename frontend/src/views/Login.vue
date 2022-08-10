@@ -69,8 +69,9 @@ $buttoncol: white;
   align-content: center;
   flex-direction: column;
   text-decoration: none;
-  min-width: 50px;
-  min-height: 30px;
+  min-width: 300px;
+  min-height: 60px;
+  font-size: 2em;
   &:disabled {
     cursor:not-allowed;
   }

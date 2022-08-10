@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoggedInRoute from '@/views/main/protected/RouteGuard'
 import AdminRoute from '@/views/main/admin/RouteGuard'
 import Login from '../views/Login.vue'
+import Home from '../views/Home.vue'
 
 const routes = [
   {
@@ -51,7 +52,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    redirect: '/protected/slideshow'
+    component: Home
   },
   {
     path: '/upload',
