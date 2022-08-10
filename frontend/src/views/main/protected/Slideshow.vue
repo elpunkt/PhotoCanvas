@@ -156,6 +156,10 @@ export default {
     border: 5px solid #ff8300;
     border-radius: 10px;
     background-color: black;
+    img {
+      max-height: 90vh;
+      max-width: 90vw;
+    }
   }
   .griditem {
     display: grid;
