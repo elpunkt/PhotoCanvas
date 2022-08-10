@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from fastapi.encoders import jsonable_encoder
 
-from . import models, schemas
+from . import models, schemas, settings
 from .security import get_password_hash, verify_password
 
 
@@ -77,5 +77,5 @@ def delete_photo(db: Session, pid: int):
     filename = obj.filename
     db.delete(obj)
     db.commit()
-    os.remove(f"frontend/public/uploaded/{filename}")
+    os.remove(f"{settings.IMG_SAVE_PATH}{filename}")
     return obj
