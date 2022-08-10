@@ -9,8 +9,6 @@ const routeGuardAdmin = async (to, from, next) => {
   if (!store.getters.hasAdminAccess) {
     next({name: 'Home'});
   } else {
-    console.log('else');
-    console.log(next);
     next()
   }
 }

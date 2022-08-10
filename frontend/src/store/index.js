@@ -54,7 +54,7 @@ const store = createStore({
           context.commit('setToken', token);
           context.commit('setLoggedIn', true);
           await context.dispatch('getUserProfile')
-          context.commit('addNotification', { content: 'Logged in yo', color: 'success' })
+          context.commit('addNotification', { content: 'Eingeloggt.', color: 'success' })
           router.push({name: 'Home'});
         } else {
           await context.dispatch('logOut');
@@ -71,7 +71,7 @@ const store = createStore({
       removeLocalToken();
       context.commit('setToken', '');
       context.commit('setLoggedIn', false);
-      context.commit('addNotification', { content: 'Logged out', color: 'success' })
+      context.commit('addNotification', { content: 'Ausgeloggt', color: 'success' })
       if (router.currentRoute.path !== '/login') {
           router.push({name: 'Login'});
       }
@@ -89,6 +89,9 @@ const store = createStore({
         if (token) {
           try {
             context.commit('setLoggedIn', true);
+            //Immidiately setting dummy profile, so that client can begin to browse protectedd routes.
+            // TODO: fix this ugly workaround
+            context.commit('setUserProfile', {email: '...loading', is_superuser: true, is_active: true})
             await context.dispatch('getUserProfile')
           } catch (error) {
             removeLocalToken();

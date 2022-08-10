@@ -27,9 +27,10 @@ export default {
   methods: {
     uploadPhoto() {
       Api.uploadPhoto(this.selectedFile, this.title)
-        .then((resp) => {
-          console.log(resp);
+        .then(() => {
           this.$store.commit('addNotification', { content: 'Das Foto wurde hochgeladen und wird in Kürze in der Diashow erscheinen', color: 'success'})
+          this.$refs.file.value = null
+          this.selectedFile = null
         })
     },
     fileChanged() {
@@ -61,7 +62,6 @@ export default {
   padding: 30px;
   border: 5px solid #ff8300;
   border-radius: 10px;
-
 }
 
 .content {
@@ -87,8 +87,9 @@ input[type="file"] {
     font-size: 2em;
 }
 
+$buttoncol: white;
 #upload-button {
-  background-color: white;
+  background-color: $buttoncol;
   cursor: pointer;
   border: 1px solid #ccc;
   padding: 6px 12px;
@@ -102,6 +103,9 @@ input[type="file"] {
   font-size: 2em;
   &:disabled {
     cursor:not-allowed;
+  }
+  &:hover {
+    background-color: darken($buttoncol,10)
   }
 }
 </style>

@@ -1,11 +1,11 @@
 <template lang="html">
   <div class="">
     <div>
-      <h1>öoawifoiqjwoeüfij</h1>
+      <h1>All Photos</h1>
       <div v-for="p in allPhotos" :key="p.id">
-        <span>{{p.filename}}</span> |
+        <span><img class="thumbnail" :src="'/uploaded/' + p.filename"></span> |
         <span>{{p.title}}</span> |
-        <a @click="deletePhoto(p.id)">Delete</a>
+        <a class="clickable" @click="deletePhoto(p.id)">Delete</a>
       </div>
     </div>
 
@@ -47,5 +47,12 @@ export default {
 
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
+.clickable {
+  cursor: pointer;
+}
+.thumbnail {
+  max-width: 200px;
+  max-height: 200px;
+}
 </style>

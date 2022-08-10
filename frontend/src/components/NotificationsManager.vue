@@ -37,6 +37,9 @@ export default {
     //   }, 4000);
     // }
   },
+  // mounted() {
+  //   this.testNotification()
+  // },
   computed: {
     latestNotification() {
       return this.$store.getters.latestNotification
@@ -68,6 +71,10 @@ $warning: #ff9900;
    right: 0;
    max-width: 20vw;
    width: 20vw;
+   @media screen and (max-width: 1000px) {
+     max-width: 100vw;
+     width: 100vw;
+   }
  }
  .single_noticiation {
    padding: 20px;
