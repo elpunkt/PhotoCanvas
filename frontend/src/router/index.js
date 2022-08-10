@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoggedInRoute from '@/views/main/protected/RouteGuard'
 import AdminRoute from '@/views/main/admin/RouteGuard'
 import Login from '../views/Login.vue'
-import PList from '../views/main/admin/photos/List'
 
 const routes = [
   {
@@ -23,9 +22,18 @@ const routes = [
       {
         name: 'Photo List',
         path: 'photos/list',
-        component: PList
-        // component: () => import(/* webpackChunkName: "admin/allPhotos" */ '../views/main/admin/photos/List.vue')
-      }
+        component: () => import(/* webpackChunkName: "admin/allPhotos" */ '../views/main/admin/photos/List.vue')
+      },
+      {
+        name: 'User List',
+        path: 'users/list',
+        component: () => import(/* webpackChunkName: "admin/allPhotos" */ '../views/main/admin/users/List.vue')
+      },
+      {
+        name: 'Create User',
+        path: 'users/create',
+        component: () => import(/* webpackChunkName: "admin-usercreate" */ '@/views/main/admin/users/Create.vue')
+      },
     ]
   },
   {

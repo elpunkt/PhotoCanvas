@@ -13,9 +13,9 @@ from fastapi import (APIRouter, HTTPException,
 from fastapi.security import OAuth2PasswordRequestForm
 
 from . import security, models, deps
-from .schemas import Message, Photo, Token, User
+from .schemas import Message, Photo, Token, User, UserCreate
 from .settings import settings
-from .crud import (create_photo, get_photos, delete_photo, user_authenticate, user_is_active)
+from .crud import (user_get, user_create, create_photo, get_photos, delete_photo, user_authenticate, user_is_active, user_get_multi, user_get_by_email, user_remove, user_get_all_superusers)
 from .websocket import ws_manager
 api_router = APIRouter()
 
@@ -59,6 +59,56 @@ def read_user_me(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     return current_user
+
+
+@api_router.get("/users", response_model=List[User])
+def read_users(
+    db: Session = Depends(deps.get_db),
+    skip: int = 0,
+    limit: int = 100,
+    current_user: models.User = Depends(deps.get_current_active_superuser),
+) -> Any:
+    users = user_get_multi(db, skip=skip, limit=limit)
+    return users
+
+@api_router.post("/users", response_model=User)
+def create_user(
+    *,
+    db: Session = Depends(deps.get_db),
+    user_in: UserCreate,
+    current_user: models.User = Depends(deps.get_current_active_superuser),
+) -> Any:
+    user = user_get_by_email(db, email=user_in.email)
+    if user:
+        raise HTTPException(
+            status_code=400,
+            detail="A user with this username already exists in the system.",
+        )
+    user = user_create(db, obj_in=user_in)
+    return user
+
+@api_router.delete("/users/{id}", response_model=Message)
+def delete_user(
+    *,
+    db: Session = Depends(deps.get_db),
+    id: int,
+    current_user: models.User = Depends(deps.get_current_active_superuser),
+) -> Any:
+    """
+    Delete a User.
+    """
+    user = user_get(db, id)
+    if not user:
+        return Message(state="success", message="Deleted")
+    if user.is_superuser:
+        alladmins = user_get_all_superusers(db)
+        if len(alladmins) == 1:
+            raise HTTPException(
+                status_code=400,
+                detail="It's not allowed to remove the last remaining superuser.",
+            )
+    user = user_remove(db=db, uid=id)
+    return Message(state="success", message="Deleted")
 
 
 @api_router.post('/upload', response_model=Message)
