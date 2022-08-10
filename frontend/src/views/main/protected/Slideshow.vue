@@ -1,8 +1,7 @@
 <template>
-  <div class="outer-wrap">
-    <div v-for="i in photoGrids"
+  <div class="outer-wrap" :style="{gridTemplateRows: 'repeat(' + this.rows + ', 1fr)', gridTemplateColumns: 'repeat(' + this.cols + ', 1fr)'}">
+    <div v-for="i in photoGridItems"
          class="griditem"
-         :class="`girditem${i.id}`"
          :key="i.id">
          <transition name="fade">
            <img v-if="i.photo"
@@ -11,10 +10,17 @@
                 :style="{maxHeight: i.photo.maxHeight + '%',
                          maxWidth: i.photo.maxWidth + '%',
                          marginTop: i.photo.marginTop + 'px',
-                         marginLeft: i.photo.marginLeft + 'px'}">
+                         marginLeft: i.photo.marginLeft + 'px',
+                         zIndex: i.photo.zIndex}">
          </transition>
     </div>
   </div>
+  <transition name="fade">
+    <div v-if="newPhoto" class="newPhotoContainer">
+      <img :src="`/uploaded/${newPhoto.filename}`"
+           :style="{zIndex: zIndex + 100}">
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -27,7 +33,11 @@ export default {
     return {
       photos: [],
       displayedPhotos: [],
-      photoGrids: [{id: 1, photo: null}, {id: 2, photo: null}, {id: 3, photo: null}, {id: 4, photo: null}, {id: 5, photo: null},{id: 6, photo: null},{id: 7, photo: null},{id: 8, photo: null}]
+      newPhoto: null,
+      photoGridItems: [],
+      cols: 0,
+      rows: 0,
+      zIndex: 1
     }
   },
   methods: {
@@ -37,7 +47,9 @@ export default {
       that.socket.onmessage = function(e) {
         let data = JSON.parse(e.data)
         if (data.action === 'add') {
-          that.photos.unshift(data.photo)
+          that.photos.push(data.photo)
+          that.newPhoto = data.photo
+          setTimeout(() => {that.removeNewPhoto()}, 6000)
           that.$store.commit('addNotification', { content: 'Neues Foto', color: 'success' })
         } else if (data.action === 'delete') {
           that.photos = that.photos.filter((p) => p.filename != data.photo.filename)
@@ -56,18 +68,22 @@ export default {
         that.socket.close()
       }
     },
+    removeNewPhoto() {
+      this.newPhoto = null;
+    },
     replacePhoto(p) {
       let oldPhoto = p.photo
       let random = Math.floor(Math.random() * this.photos.length);
       let randomPhoto = this.photos[random]
       if (!(this.displayedPhotos.includes(randomPhoto.filename)) && !(randomPhoto === oldPhoto)) {
-        //random Margins in range -100 to 100
-        randomPhoto.marginTop = Math.floor(Math.random()*200-100)
-        randomPhoto.marginLeft = Math.floor(Math.random()*200-100)
+        //random Margins in range -70 to 70
+        randomPhoto.marginTop = Math.floor(Math.random()*140-70)
+        randomPhoto.marginLeft = Math.floor(Math.random()*140-70)
         // ranom MaxDimensions in range 100 to 120
         randomPhoto.maxWidth = Math.floor(Math.random()* (120 - 100 +1) + 100)
         randomPhoto.maxHeight = Math.floor(Math.random()* (120 - 100 +1) + 100)
-
+        randomPhoto.zIndex = this.zIndex
+        this.zIndex ++
         p.photo = randomPhoto
         this.displayedPhotos.push(randomPhoto.filename)
         if (oldPhoto) {
@@ -86,6 +102,17 @@ export default {
     }
   },
   mounted() {
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    this.cols = Math.floor(width/480);
+    this.rows = Math.floor(height/480);
+    for (let col=0; col<this.cols; col ++) {
+      for (let row=0; row<this.rows; row++) {
+        this.photoGridItems.push({photo:null})
+      }
+    }
+
+
     Api.getAllPhotos(this.$store.state.token)
       .then(resp => {
         this.photos = resp.data
@@ -94,10 +121,9 @@ export default {
         this.connectWebSocket()
       })
       .finally(() => {
-        this.photoGrids.forEach((p) => {
+        this.photoGridItems.forEach((p) => {
           this.replacePhoto(p)
         });
-
       })
   },
   beforeUnmount() {
@@ -119,10 +145,18 @@ export default {
     height: 100vh;
     background-color: black;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(12, 1fr);
   }
-
+  .newPhotoContainer {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    padding: 30px;
+    border: 5px solid #ff8300;
+    border-radius: 10px;
+    background-color: black;
+  }
   .griditem {
     display: grid;
     justify-items: center;
@@ -134,70 +168,6 @@ export default {
       max-width: 100%;
       max-height: 100%;
     }
-  }
-
-  .girditem1 {
-    grid-column-start: 0;
-    grid-column-end: 2;
-    grid-row-start:1;
-    grid-row-end:5;
-    // background-color: red;
-  }
-
-  .girditem2 {
-    grid-column-start: 0;
-    grid-column-end: 2;
-    grid-row-start:5;
-    grid-row-end:9;
-    // background-color: blue;
-  }
-
-  .girditem3 {
-    grid-column-start: 0;
-    grid-column-end: 2;
-    grid-row-start:9;
-    grid-row-end:13;
-    // background-color: green;
-  }
-
-  .girditem4 {
-    grid-column-start: 2;
-    grid-column-end: 3;
-    grid-row-start:1;
-    grid-row-end:7;
-    // background-color: green;
-  }
-
-  .girditem5 {
-    grid-column-start: 3;
-    grid-column-end: 4;
-    grid-row-start:1;
-    grid-row-end:7;
-    // background-color: blue;
-  }
-
-  .girditem6 {
-    grid-column-start: 2;
-    grid-column-end: 4;
-    grid-row-start:7;
-    grid-row-end:13;
-    // background-color: red;
-  }
-
-  .girditem7 {
-    grid-column-start: 4;
-    grid-column-end: 5;
-    grid-row-start:1;
-    grid-row-end:8;
-    // background-color: green;
-  }
-
-  .girditem8 {
-    grid-column-start: 4;
-    grid-column-end: 5;
-    grid-row-start:8;
-    grid-row-end:13;
-    // background-color: blue;
   }
 
   .fade-enter-active,
