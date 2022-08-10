@@ -72,6 +72,7 @@ export default {
       this.newPhoto = null;
     },
     replacePhoto(p) {
+      console.log(p);
       let oldPhoto = p.photo
       let random = Math.floor(Math.random() * this.photos.length);
       let randomPhoto = this.photos[random]
@@ -99,20 +100,28 @@ export default {
         that.replacePhoto(p)
       }, replaceIn*1000);
 
+    },
+    calcDimensions() {
+      this.photoGridItems = [];
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+      this.cols = Math.floor(width/480);
+      this.rows = Math.floor(height/480);
+      if (this.cols === 0) {
+        this.cols = 1;
+      }
+      if (this.rows === 0) {
+        this.rows = 1;
+      }
+      for (let col=0; col<this.cols; col ++) {
+        for (let row=0; row<this.rows; row++) {
+          this.photoGridItems.push({photo:null})
+        }
+      }
     }
   },
   mounted() {
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    this.cols = Math.floor(width/480);
-    this.rows = Math.floor(height/480);
-    for (let col=0; col<this.cols; col ++) {
-      for (let row=0; row<this.rows; row++) {
-        this.photoGridItems.push({photo:null})
-      }
-    }
-
-
+    this.calcDimensions()
     Api.getAllPhotos(this.$store.state.token)
       .then(resp => {
         this.photos = resp.data

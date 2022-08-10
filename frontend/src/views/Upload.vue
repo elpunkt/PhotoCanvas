@@ -26,7 +26,9 @@ export default {
   },
   methods: {
     uploadPhoto() {
-      Api.uploadPhoto(this.selectedFile, this.title)
+      let f = this.selectedFile;
+      this.selectedFile = null;
+      Api.uploadPhoto(f, this.title)
         .then(() => {
           this.$store.commit('addNotification', { content: 'Das Foto wurde hochgeladen und wird in Kürze in der Diashow erscheinen', color: 'success'})
           this.$refs.file.value = null
