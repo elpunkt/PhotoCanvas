@@ -3,6 +3,7 @@ venv/
 database.db
 frontend/public/uploaded/*
 frontend/dist/uploaded/*
+notes
 
 .DS_Store
 node_modules

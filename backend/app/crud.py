@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from fastapi.encoders import jsonable_encoder
 
-from . import models, schemas, settings
+from .settings import settings
+from . import models, schemas
 from .security import get_password_hash, verify_password
 
 
