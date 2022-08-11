@@ -4,7 +4,7 @@
       <form class="content">
         <input v-model="email" name="login" label="Login" type="text" placeholder="Email">
         <input v-model="password" name="password" label="Password" type="password" placeholder="Password">
-        <button id="login-button" @click.prevent="submit">Login</button>
+        <button id="login-button" :disabled="working" @click.prevent="submit">Login</button>
       </form>
     </div>
   </div>
@@ -18,11 +18,21 @@ export default {
     return {
       email: null,
       password: null,
+      working: false,
     }
   },
   methods: {
     submit() {
+      this.working = true;
       this.$store.dispatch('logIn', {username: this.email, password: this.password})
+      this.working = false;
+        // .then(() => {
+        //   this.working = false;
+        // })
+        // .catch(() => {
+        //   console.log('Login error');
+        //   this.working = false
+        // })
     }
   }
 }

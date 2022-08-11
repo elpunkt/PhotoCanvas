@@ -7,15 +7,14 @@ import { apiClient } from '@/api/api'
 apiClient.interceptors.response.use(function (response) {
     return response;
 }, function (error) {
-  console.log(error);
-  if (error.response) {
-    if (401 === error.response.status) {
-        store.dispatch('logOut')
-    }
-  }
-  else {
-      return Promise.reject(error);
-  }
+  return Promise.reject(error);
+  // 
+  // if ((error.response) && (401 === error.response.status)) {
+  //     store.dispatch('logOut')
+  // }
+  // else {
+  //     return Promise.reject(error);
+  // }
 });
 
 

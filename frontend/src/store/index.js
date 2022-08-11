@@ -60,8 +60,7 @@ const store = createStore({
           await context.dispatch('logOut');
         }
       } catch (err) {
-          console.log(err);
-          // context.commit('addNotification', { content: err.response.data.detail, color: 'warning'})
+          context.commit('addNotification', { content: err.response.data.detail, color: 'warning'})
           removeLocalToken();
           context.commit('setToken', '');
           context.commit('setLoggedIn', false);
