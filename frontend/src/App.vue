@@ -13,6 +13,9 @@ export default {
   },
   created() {
     this.$store.dispatch('checkLoggedIn')
+  },
+  mounted() {
+    document.title= 'Merle & Jan';
   }
 }
 </script>
