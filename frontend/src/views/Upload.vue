@@ -8,9 +8,11 @@
         <button id="upload-button"
                 @click="uploadPhoto"
                 :disabled="!selectedFile"><span><span v-if="!selectedFile">&#x1F6A7;---&#x1F6A7;---&#x1F6A7;</span><span v-else><span>und ab dafür!</span> &#x1F470;❤️&#x1F935;</span></span></button>
-        {{fileSelected}}
       </div>
     </div>
+  </div>
+  <div v-if="isLoading" class="loadingscreen">
+
   </div>
 </template>
 
@@ -21,11 +23,13 @@ export default {
   data() {
     return {
       title: null,
-      selectedFile: null
+      selectedFile: null,
+      isLoading: false
     }
   },
   methods: {
     uploadPhoto() {
+      this.isLoading = true
       let f = this.selectedFile;
       this.selectedFile = null;
       Api.uploadPhoto(f, this.title)
@@ -33,6 +37,9 @@ export default {
           this.$store.commit('addNotification', { content: 'Das Foto wurde hochgeladen und wird in Kürze in der Diashow erscheinen', color: 'success'})
           this.$refs.file.value = null
           this.selectedFile = null
+        })
+        .finally(() => {
+          this.isLoading = false;
         })
     },
     fileChanged() {
@@ -43,6 +50,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.loadingscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  opacity: 0.5;
+  cursor: wait;
+}
+
+
 #header {
   display: none;
 }
