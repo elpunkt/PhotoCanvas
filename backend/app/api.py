@@ -4,7 +4,7 @@ import random
 import math
 from typing import Any
 
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, UnidentifiedImageError, ImageOps
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -19,12 +19,15 @@ from .crud import (photo_get, user_get, user_create, create_photo, get_photos, d
 from .websocket import ws_manager
 api_router = APIRouter()
 
-async def process_image(img, title, db):
+
+async def process_image(imgin, title, db):
+    img = ImageOps.exif_transpose(imgin)
     img_name = f"{math.floor(time.time())}_{random.randint(10000,99999)}.{img.format}"
     img.thumbnail((settings.MAX_IMG_WIDTH, settings.MAX_IMG_HEIGHT))
     img.save(f"{settings.IMG_SAVE_PATH}{img_name}",
              quality=settings.IMG_QUALITY,
-             optimize=settings.OPTIMIZE_IMGS)
+             optimize=settings.OPTIMIZE_IMGS,
+             format=imgin.format)
     photo_meta = {"title":title, "filename": img_name, "upload_date": time.time()}
     create_photo(db, photo_meta)
     await ws_manager.broadcast_photo_action({'action': 'add', 'photo': photo_meta})
@@ -152,5 +155,6 @@ def rotate_photo(pid: int,
     out = img.rotate(90, expand=True)
     out.save(f"{settings.IMG_SAVE_PATH}{photo.filename}",
                 quality=settings.IMG_QUALITY,
-                optimize=settings.OPTIMIZE_IMGS)
+                optimize=settings.OPTIMIZE_IMGS,
+                format=img.format)
     return Message(state="success", message="Photo rotated")
