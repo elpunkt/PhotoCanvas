@@ -4,7 +4,8 @@
       <h1>All Photos</h1>
       <div v-for="p in allPhotos" :key="p.id">
         <span><img class="thumbnail" :src="'/uploaded/' + p.filename"></span> |
-        <span>{{p.title}}</span> |
+        <span v-if="p.title">{{p.title}}</span> |
+        <a class="clickable" @click="rotatePhoto(p.id)">Rotate</a> |
         <a class="clickable" @click="deletePhoto(p.id)">Delete</a>
       </div>
     </div>
@@ -28,6 +29,12 @@ export default {
           if (resp.data.state === 'success') {
             this.allPhotos = this.allPhotos.filter((p) => p.id != id)
           }
+        })
+    },
+    rotatePhoto(id) {
+      Api.rotatePhoto(this.$store.state.token, id)
+        .then(resp => {
+          console.log(resp);
         })
     }
   },

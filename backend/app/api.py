@@ -15,7 +15,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from . import security, models, deps
 from .schemas import Message, Photo, Token, User, UserCreate
 from .settings import settings
-from .crud import (user_get, user_create, create_photo, get_photos, delete_photo, user_authenticate, user_is_active, user_get_multi, user_get_by_email, user_remove, user_get_all_superusers)
+from .crud import (photo_get, user_get, user_create, create_photo, get_photos, delete_photo, user_authenticate, user_is_active, user_get_multi, user_get_by_email, user_remove, user_get_all_superusers)
 from .websocket import ws_manager
 api_router = APIRouter()
 
@@ -131,6 +131,7 @@ def get_all_photos(db: Session = Depends(deps.get_db),
                    current_user: models.User = Depends(deps.get_current_active_user)):
     return get_photos(db, skip=None, limit=None)
 
+
 @api_router.delete('/photos/{pid}', response_model=Message)
 async def delete_photo_by_id(pid: int,
                              db: Session = Depends(deps.get_db),
@@ -138,3 +139,18 @@ async def delete_photo_by_id(pid: int,
     deleted_photo = delete_photo(db, pid)
     await ws_manager.broadcast_photo_action({'action': 'delete', 'photo': deleted_photo})
     return Message(state="success", message="Photo deleted.")
+
+
+@api_router.get('/photos/{pid}/rotate', response_model=Message)
+def rotate_photo(pid: int,
+                 db: Session = Depends(deps.get_db),
+                 current_user: models.User = Depends(deps.get_current_active_superuser)):
+    photo = photo_get(db=db, pid=pid)
+    if not photo:
+        return {"state":"error", "message":"No photo with this id."}
+    img = Image.open(f"{settings.IMG_SAVE_PATH}{photo.filename}")
+    out = img.rotate(90, expand=True)
+    out.save(f"{settings.IMG_SAVE_PATH}{photo.filename}",
+                quality=settings.IMG_QUALITY,
+                optimize=settings.OPTIMIZE_IMGS)
+    return Message(state="success", message="Photo rotated")

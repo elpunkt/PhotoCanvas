@@ -66,6 +66,10 @@ def get_photos(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Photo).offset(skip).limit(limit).order_by(models.Photo.upload_date.desc()).all()
 
 
+def photo_get(db: Session, pid: int):
+    return db.query(models.Photo).filter(models.Photo.id == pid).first()
+
+
 def create_photo(db: Session, photo: schemas.PhotoCreate):
     db_photo = models.Photo(**jsonable_encoder(photo))
     db.add(db_photo)

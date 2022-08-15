@@ -66,5 +66,8 @@ export const Api = {
   },
   async deletePhoto(token, id) {
     return apiClient.delete('/photos/' + id, authHeaders(token))
+  },
+  async rotatePhoto(token, id) {
+    return apiClient.get('/photos/' + id + '/rotate', authHeaders(token))
   }
 }
