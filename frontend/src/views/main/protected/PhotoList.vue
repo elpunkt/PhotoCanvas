@@ -2,16 +2,23 @@
   <div class="">
     <div>
       <h1>All Photos</h1>
-      <div v-for="p in allPhotos" :key="p.id">
-        <span><img class="thumbnail" :src="'/uploaded/' + p.filename"></span><br>
-        <div v-if="$store.getters.hasAdminAccess">
-          <v-button :type="'info'" :onClick="rotatePhoto.bind(this, p.id)">Rotate &#x1F504;</v-button>
-          <v-button :type="'error'"
-                    :onClick="deletePhoto.bind(this, p.id)"
-                    :confirmText="'Foto löschen'"
-                    :cancelText="'Abbrechen'"
-                    needsConfirmation>Delete &#x1F5D1;</v-button>
-        </div>
+      <div class="photoList">
+        <div v-for="p in allPhotos" :key="p.id">
+          <span><img class="thumbnail" :src="'/uploaded/' + p.filename"></span><br>
+          <div class="controls">
+            <v-button :type="'warning'"
+            :onClick="downloadPhoto.bind(this, p.filename)">Save</v-button>
+            <v-button v-if="$store.getters.hasAdminAccess"
+            :type="'info'"
+            :onClick="rotatePhoto.bind(this, p.id)">Rotate &#x1F504;</v-button>
+            <v-button v-if="$store.getters.hasAdminAccess"
+            :type="'error'"
+            :onClick="deletePhoto.bind(this, p.id)"
+            :confirmText="'Foto löschen'"
+            :cancelText="'Abbrechen'"
+            needsConfirmation>Delete &#x1F5D1;</v-button>
+          </div>
+      </div>
       </div>
     </div>
   </div>
@@ -44,6 +51,9 @@ export default {
         .then(resp => {
           console.log(resp);
         })
+    },
+    downloadPhoto(filename) {
+      window.open('/uploaded/' + filename)
     }
   },
   mounted() {
@@ -63,11 +73,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.clickable {
-  cursor: pointer;
+.photoList {
+  display: flex;
+  flex-direction: row;
+  overflow: scroll;
+  max-height: 94vh;
+  align-items: flex-end;
+  > div {
+    margin-left: 40px;
+    margin-bottom: 20px;
+  }
 }
-.thumbnail {
-  max-width: 200px;
-  max-height: 200px;
-}
+
 </style>
