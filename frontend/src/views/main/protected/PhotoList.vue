@@ -3,20 +3,28 @@
     <div>
       <h1>All Photos</h1>
       <div v-for="p in allPhotos" :key="p.id">
-        <span><img class="thumbnail" :src="'/uploaded/' + p.filename"></span> |
-        <span v-if="p.title">{{p.title}}</span> |
-        <a class="clickable" @click="rotatePhoto(p.id)">Rotate</a> |
-        <a class="clickable" @click="deletePhoto(p.id)">Delete</a>
+        <span><img class="thumbnail" :src="'/uploaded/' + p.filename"></span><br>
+        <div v-if="$store.getters.hasAdminAccess">
+          <v-button :type="'info'" :onClick="rotatePhoto.bind(this, p.id)">Rotate &#x1F504;</v-button>
+          <v-button :type="'error'"
+                    :onClick="deletePhoto.bind(this, p.id)"
+                    :confirmText="'Foto löschen'"
+                    :cancelText="'Abbrechen'"
+                    needsConfirmation>Delete &#x1F5D1;</v-button>
+        </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
 import {Api} from "@/api/api.js";
+import Button from "@/components/Button"
 
 export default {
+  components: {
+    'v-button' : Button
+  },
   data() {
     return {
       allPhotos: []

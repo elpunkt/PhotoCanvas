@@ -17,14 +17,9 @@ const routes = [
   },
   {
     path: '/admin',
-    redirect: 'admin/photos/list',
+    redirect: 'admin/users/list',
     component: AdminRoute,
     children: [
-      {
-        name: 'Photo List',
-        path: 'photos/list',
-        component: () => import(/* webpackChunkName: "admin/allPhotos" */ '../views/main/admin/photos/List.vue')
-      },
       {
         name: 'User List',
         path: 'users/list',
@@ -46,7 +41,12 @@ const routes = [
         name: 'Slideshow',
         path: '/protected/slideshow',
         component: () => import(/* webpackChunkName: "protected/Slideshow" */ '../views/main/protected/Slideshow.vue')
-      }
+      },
+      {
+        name: 'Photo List',
+        path: '/protected/photolist',
+        component: () => import(/* webpackChunkName: "protected/Photo List" */ '../views/main/protected/PhotoList.vue')
+      },
     ]
   },
   {

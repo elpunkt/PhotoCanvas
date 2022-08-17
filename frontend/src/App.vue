@@ -1,6 +1,5 @@
 <template>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💐</text></svg>">
-  <Header/>
   <router-view/>
   <NotificationsManager/>
   <div class="credits">
@@ -8,11 +7,9 @@
   </div>
 </template>
 <script>
-import Header from '@/components/Header.vue';
 import NotificationsManager from '@/components/NotificationsManager.vue';
 export default {
   components: {
-    Header,
     NotificationsManager
   },
   created() {
@@ -39,7 +36,10 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: black;
+  background-color: black;
+  width: 100vw;
+  height: 100vh;
 }
 
 .credits {

@@ -1,16 +1,17 @@
 <template lang="html">
-  <div class="outer-wrap">
-    <div class="inner-wrap">
-      <div class="content">
-        <label for="file-upload" class="file-upload-label">Foto auswählen &#x1F5BC;</label>
-        <input id="file-upload" type="file" ref="file" @change="fileChanged"><br>
-        <!-- <input type="text" v-model="title" placeholder="Titel/Beschreibung (optional)"><br> -->
-        <button id="upload-button"
-                @click="uploadPhoto"
-                :disabled="!selectedFile"><span><span v-if="!selectedFile">&#x1F6A7;---&#x1F6A7;---&#x1F6A7;</span><span v-else><span>und ab dafür!</span> &#x1F470;❤️&#x1F935;</span></span></button>
-      </div>
+  <centeredDiv>
+    <div class="content">
+      <label for="file-upload" class="file-upload-label">Foto auswählen &#x1F5BC;</label>
+      <input id="file-upload" type="file" ref="file" @change="fileChanged"><br>
+      <btn id="customButton"
+           :size="'large'"
+           :type="'success'"
+           :onClick="uploadPhoto"
+           :disabled="!selectedFile"
+           :style="{minWidth: '300px'}"
+           ><span><span v-if="!selectedFile">&#x1F6A7;---&#x1F6A7;---&#x1F6A7;</span><span v-else><span>und ab dafür!</span> &#x1F470;❤️&#x1F935;</span></span></btn>
     </div>
-  </div>
+  </centeredDiv>
   <div v-if="isLoading" class="loadingscreen">
 
   </div>
@@ -18,8 +19,14 @@
 
 <script>
 import {Api} from "@/api/api.js";
+import centeredDiv from '@/components/layout/CenteredDiv'
+import Button from '@/components/Button'
 
 export default {
+  components: {
+    'btn': Button,
+    centeredDiv
+  },
   data() {
     return {
       title: null,
@@ -61,30 +68,6 @@ export default {
   cursor: wait;
 }
 
-
-#header {
-  display: none;
-}
-.outer-wrap {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: black;
-}
-.inner-wrap {
-  background-color: white;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  padding: 30px;
-  border: 5px solid #ff8300;
-  border-radius: 10px;
-}
-
 .content {
   color: black;
   background-color: white;
@@ -94,12 +77,12 @@ export default {
 input[type="file"] {
     display: none;
 }
-$buttoncol: white;
 
 .file-upload-label {
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     display: flex;
-    padding: 6px 12px;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.1rem;
     cursor: pointer;
     min-width: 300px;
     min-height: 60px;
@@ -108,29 +91,7 @@ $buttoncol: white;
     flex-direction: column;
     font-size: 2em;
     &:hover {
-      background-color: lighten(green,50)
+      background-color: darken(#2ecc71, 8%)
     }
-}
-
-#upload-button {
-  background-color: $buttoncol;
-  cursor: pointer;
-  border: 1px solid #ccc;
-  padding: 6px 12px;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  flex-direction: column;
-  text-decoration: none;
-  min-width: 300px;
-  min-height: 60px;
-  font-size: 2em;
-  &:disabled {
-    cursor:not-allowed;
-    background-color: darken($buttoncol,10);
-  }
-  &:hover {
-    background-color: darken($buttoncol,10);
-  }
 }
 </style>
