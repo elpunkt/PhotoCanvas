@@ -124,9 +124,9 @@ def upload_photo(background_tasks: BackgroundTasks,
     try:
         image = Image.open(photo.file)
     except UnidentifiedImageError:
-        return {"state":"error", "message": "Dieses Dateiformat wird leider nicht unterstützt."}
+        return {"state":"error", "message": f"Das Dateiformat der Datei '{photo.filename}' wird leider nicht unterstützt."}
     background_tasks.add_task(process_image, image, title, db)
-    return Message(state="success", message="File is beeing processed.")
+    return Message(state="success", message="Das Foto wird verarbeitet und in Kürze auf der Fotowand erscheinen.")
 
 
 @api_router.get('/photos', response_model=List[Photo])

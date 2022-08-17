@@ -1,15 +1,15 @@
 <template lang="html">
   <centeredDiv>
     <div class="content">
-      <label for="file-upload" class="file-upload-label">Foto auswählen &#x1F5BC;</label>
-      <input id="file-upload" type="file" ref="file" @change="fileChanged"><br>
+      <label for="file-upload" class="file-upload-label">Fotos auswählen &#x1F5BC;</label>
+      <input id="file-upload" type="file" ref="file" @change="fileChanged" multiple><br>
       <btn id="customButton"
            :size="'large'"
            :type="'success'"
            :onClick="uploadPhoto"
-           :disabled="!selectedFile"
+           :disabled="!fileSelected"
            :style="{minWidth: '300px'}"
-           ><span><span v-if="!selectedFile">&#x1F6A7;---&#x1F6A7;---&#x1F6A7;</span><span v-else><span>und ab dafür!</span> &#x1F470;❤️&#x1F935;</span></span></btn>
+           ><span><span v-if="!fileSelected">&#x1F6A7;---&#x1F6A7;---&#x1F6A7;</span><span v-else><span>und ab dafür!</span> &#x1F470;❤️&#x1F935;</span></span></btn>
     </div>
   </centeredDiv>
   <div v-if="isLoading" class="loadingscreen">
@@ -29,28 +29,31 @@ export default {
   },
   data() {
     return {
-      title: null,
-      selectedFile: null,
+      fileSelected: false,
       isLoading: false
     }
   },
   methods: {
     uploadPhoto() {
       this.isLoading = true
-      let f = this.selectedFile;
-      this.selectedFile = null;
-      Api.uploadPhoto(f, this.title)
-        .then(() => {
-          this.$store.commit('addNotification', { content: 'Das Foto wurde hochgeladen und wird in Kürze in der Diashow erscheinen', color: 'success'})
-          this.$refs.file.value = null
-          this.selectedFile = null
-        })
-        .finally(() => {
-          this.isLoading = false;
-        })
+      var promises = Array.from(this.$refs.file.files).map((f) => {
+        return Api.uploadPhoto(f)
+          .then((r) => {
+            this.$store.commit('addNotification', { content: r.data.message, color: r.data.state})
+          })
+      })
+      Promise.all(promises).then(() => {
+        this.$refs.file.value = null;
+        this.isLoading = false;
+        this.fileChanged()
+      })
     },
     fileChanged() {
-      this.selectedFile = this.$refs.file.files[0]
+      if (this.$refs.file.files.length > 0) {
+        this.fileSelected = true;
+      } else {
+        this.fileSelected = false;
+      }
     }
   },
 }

@@ -16,8 +16,8 @@
     </div>
   </div>
   <transition name="fade">
-    <div v-if="newPhoto" class="newPhotoContainer">
-      <img :src="`/uploaded/${newPhoto.filename}`"
+    <div v-if="displayedNewPhoto" class="newPhotoContainer">
+      <img :src="`/uploaded/${displayedNewPhoto.filename}`"
            :style="{zIndex: zIndex + 100}">
     </div>
   </transition>
@@ -33,11 +33,32 @@ export default {
     return {
       photos: [],
       displayedPhotos: [],
-      newPhoto: null,
+      newPhotos: [],
+      displayedNewPhoto: null,
+      readyForNewPhoto: true,
       photoGridItems: [],
       cols: 0,
       rows: 0,
       zIndex: 1
+    }
+  },
+  watch: {
+    newPhotos: {
+      handler(oldList, newList) {
+        if (this.readyForNewPhoto) {
+          this.readyForNewPhoto = false;
+          let that = this
+          that.displayedNewPhoto = newList[0]
+          setTimeout(() => {
+            that.displayedNewPhoto = null;
+            setTimeout(() => {
+              that.readyForNewPhoto = true;
+              that.newPhotos.shift()
+            }, 3000);
+          }, 6000);
+        }
+      },
+      deep: true
     }
   },
   methods: {
@@ -48,8 +69,8 @@ export default {
         let data = JSON.parse(e.data)
         if (data.action === 'add') {
           that.photos.push(data.photo)
-          that.newPhoto = data.photo
-          setTimeout(() => {that.removeNewPhoto()}, 6000)
+          that.newPhotos.push(data.photo)
+          console.log(that.newPhotos);
           that.$store.commit('addNotification', { content: 'Neues Foto', color: 'success' })
         } else if (data.action === 'delete') {
           that.photos = that.photos.filter((p) => p.filename != data.photo.filename)
@@ -68,11 +89,7 @@ export default {
         that.socket.close()
       }
     },
-    removeNewPhoto() {
-      this.newPhoto = null;
-    },
     replacePhoto(p) {
-      console.log(p);
       let oldPhoto = p.photo
       let random = Math.floor(Math.random() * this.photos.length);
       let randomPhoto = this.photos[random]
