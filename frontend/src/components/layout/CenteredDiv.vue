@@ -20,14 +20,12 @@ export default {
    height: 100vh;
    background-color: rgba(255,255,255,0.8);
    cursor: not-allowed;
+   display: flex;
+   justify-content: center;
+   align-items: center;
  }
  .innerWrap {
    background-color: white;
-   position: absolute;
-   left: 50%;
-   top: 50%;
-   -webkit-transform: translate(-50%, -50%);
-   transform: translate(-50%, -50%);
    padding: 30px;
    border: 5px solid #ff8300;
    border-radius: 10px;

@@ -16,6 +16,7 @@
             :onClick="deletePhoto.bind(this, p.id)"
             :confirmText="'Foto löschen'"
             :cancelText="'Abbrechen'"
+            :confirmQuestion="'Willst du dieses Foto wirklich unwiderruflich löschen?'"
             needsConfirmation>Delete &#x1F5D1;</v-button>
           </div>
       </div>
@@ -58,7 +59,6 @@ export default {
   },
   mounted() {
     try {
-      console.log(this.$store.state.token);
       Api.getAllPhotos(this.$store.state.token)
         .then((response) => {
           this.allPhotos = response.data
@@ -77,11 +77,22 @@ export default {
   display: flex;
   flex-direction: row;
   overflow: scroll;
-  max-height: 94vh;
   align-items: flex-end;
+  height: 94vh;
   > div {
     margin-left: 40px;
     margin-bottom: 20px;
+  }
+}
+
+.thumbnail {
+  max-height: 90vh;
+  max-width: 98vw;
+}
+
+.controls {
+  > ::v-deep button {
+    margin-left: 5px;
   }
 }
 

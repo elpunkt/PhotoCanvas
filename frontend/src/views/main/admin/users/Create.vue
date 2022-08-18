@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="">
+  <centeredDiv>
     <form @keyup.enter="submit">
       <div class="">
         <div class="">Email</div>
@@ -21,14 +21,24 @@
         <div class="">Confirm new Password</div>
         <input v-model="password2" type="password">
       </div>
-      <button @click.prevent="submit">Submit</button>
+      <btn :onClick="submit"
+           :size="'small'"
+           :type="'success'"
+           :style="{marginTop:'10px'}">Submit</btn>
     </form>
-  </div>
+  </centeredDiv>
 </template>
 
 <script>
 import { Api } from '@/api/api';
+import centeredDiv from '@/components/layout/CenteredDiv'
+import Button from '@/components/Button'
+
 export default {
+  components: {
+    'btn': Button,
+    centeredDiv
+  },
   data() {
     return {
       email: '',

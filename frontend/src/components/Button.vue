@@ -11,6 +11,7 @@
 </button>
 <centeredDiv v-if="showConfirmButton">
   <div class="confirmButtonWrapper">
+    <div v-if="confirmQuestion">{{confirmQuestion}}</div>
     <button class="btn btn-success" @click.prevent="confirmClick">{{confirmText}}</button>
     <button class="btn btn-warning" @click.prevent="cancelClick">{{cancelText}}</button>
   </div>
@@ -34,6 +35,9 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    confirmQuestion: {
+      type: String
     },
     confirmText: {
       type: String,
@@ -153,5 +157,11 @@ $errorCol: #e74c3c;
 
 .btn-error {
    @include button-bg($errorCol);
+}
+
+.confirmButtonWrapper {
+  > button {
+    margin: 10px;
+  }
 }
 </style>

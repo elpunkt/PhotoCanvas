@@ -1,23 +1,32 @@
 <template lang="html">
-  <div class="">
-    <div>
-      <h1>All Users</h1>
-      <div v-for="u in allUsers" :key="u.id">
-        <span>{{u.email}}</span> |
-        <span v-if="u.is_superuser">Admin</span><span v-else>User</span> |
-        <a class="clickable" @click="deleteUser(u.id)">Delete</a>
-      </div>
-      <router-link :to="{ name: 'Create User'}">Create</router-link>
-    </div>
-
-
-  </div>
+  <centeredDiv>
+        <h1>All Users</h1>
+        <div class="list">
+          <div class="list-row" v-for="u in allUsers" :key="u.id">
+            <span>{{u.email}}</span>
+            <span v-if="u.is_superuser">Admin</span><span v-else>User</span>
+            <btn :onClick="deleteUser.bind(this, u.id)"
+            :type="'error'"
+            :size="'mini'"
+            needsConfirmation>Delete &#x1F5D1;</btn>
+          </div>
+        </div>
+        <btn :type="'success'"
+             :size="'small'"
+             :onClick="$router.push.bind(this, { name: 'Create User'})">Create</btn>
+  </centeredDiv>
 </template>
 
 <script>
 import {Api} from "@/api/api.js";
+import centeredDiv from '@/components/layout/CenteredDiv'
+import Button from '@/components/Button'
 
 export default {
+  components: {
+    'btn': Button,
+    centeredDiv
+  },
   data() {
     return {
       allUsers: []
@@ -49,11 +58,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.clickable {
-  cursor: pointer;
+.list {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
-.thumbnail {
-  max-width: 200px;
-  max-height: 200px;
+.list-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  align-items: center;
+  min-width: 300px;
 }
 </style>
