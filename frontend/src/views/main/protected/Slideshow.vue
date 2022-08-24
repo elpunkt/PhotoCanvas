@@ -47,7 +47,6 @@ export default {
         if ((newList.length >= 50) || newList.length == this.photos.length) {
           newList.shift()
           this.displayedPhotos.shift()
-          console.log('removed last elements');
         }
       },
       deep: true
@@ -113,16 +112,15 @@ export default {
         this.photoHtmlItems.push({photo: randomPhoto})
         this.displayedPhotos.push(randomPhoto.filename)
       } else {
-        console.log('no photo that is not displayed');
         this.addPhoto()
       }
     },
-    addEvery5seconds(){
+    addEveryXseconds(X){
       this.addPhoto()
       let that = this;
       setTimeout(() => {
-        that.addEvery5seconds()
-      }, 5000)
+        that.addEveryXseconds(X)
+      }, X * 1000)
     },
     calcDimensions() {
       let width = window.innerWidth;
@@ -141,7 +139,7 @@ export default {
         this.connectWebSocket()
       })
       .finally(() => {
-        this.addEvery5seconds()
+        this.addEveryXseconds(4)
       })
   },
   beforeUnmount() {
