@@ -1,14 +1,18 @@
 <template>
-  <div class="outer-wrap">
-    <div class="photoItemContainer" v-for="i in photoHtmlItems"
+  <div class="outer-wrap" :style="{gridTemplateRows: 'repeat(' + this.rows + ', 1fr)', gridTemplateColumns: 'repeat(' + this.cols + ', 1fr)'}">
+    <div v-for="i in photoGridItems"
+         class="griditem"
          :key="i.id">
+         <transition name="fade">
            <img v-if="i.photo"
-                class="photoItem"
                 :src="`/uploaded/${i.photo.filename}`"
                 :key="i.photo.filename"
-                :style="{left: i.photo.left + 'px',
-                         top: i.photo.top + 'px',
+                :style="{maxHeight: i.photo.maxHeight + '%',
+                         maxWidth: i.photo.maxWidth + '%',
+                         marginTop: i.photo.marginTop + 'px',
+                         marginLeft: i.photo.marginLeft + 'px',
                          zIndex: i.photo.zIndex}">
+         </transition>
     </div>
   </div>
   <transition name="fade">
@@ -18,18 +22,21 @@
     </div>
   </transition>
   <div class="statsandcontrols">
-    <span style="cursor:pointer; font-size:2em;" @click="addPhoto">&#x1F3B2;</span>
-    <div> {{photos.length}} Fotos in der Sammlung</div>
-    <div v-if="newPhotos.length > 1">{{newPhotos.length - 1}} Neue Fotos in der Warteschlange</div>
+    <div v-if="newPhotos.length > 0">{{newPhotos.length - 1}} Neue Fotos in der Warteschlange</div>
+    <btn type='info' :onClick="replacePhoto.bind(this, photoGridItems[0])">new</btn>
   </div>
 </template>
 
 <script>
 import {Api} from "@/api/api.js";
 import {wsUrl} from '@/env'
+import Button from '@/components/Button'
 
 export default {
   name: 'Home',
+  components: {
+    'btn': Button
+  },
   data() {
     return {
       photos: [],
@@ -37,22 +44,13 @@ export default {
       newPhotos: [],
       displayedNewPhoto: null,
       readyForNewPhoto: true,
-      photoHtmlItems: [],
+      photoGridItems: [],
+      cols: 0,
+      rows: 0,
       zIndex: 1
     }
   },
   watch: {
-    photoHtmlItems: {
-      handler(oldList, newList) {
-        if ((newList.length >= 50) || newList.length == this.photos.length) {
-          newList.shift()
-          this.displayedPhotos.shift()
-          console.log('removed last elements');
-        }
-      },
-      deep: true
-    },
-
     newPhotos: {
       handler(oldList, newList) {
         if (this.readyForNewPhoto) {
@@ -98,37 +96,52 @@ export default {
         that.socket.close()
       }
     },
-    addPhoto() {
+    replacePhoto(p) {
+      let oldPhoto = p.photo
       let random = Math.floor(Math.random() * this.photos.length);
       let randomPhoto = this.photos[random]
-      if (!(this.displayedPhotos.includes(randomPhoto.filename))) {
-        randomPhoto.left = Math.floor(Math.random()* this.maxLeft)
-        randomPhoto.top = Math.floor(Math.random()* this.minTop)
-        randomPhoto.maxWidth = 480;
-        randomPhoto.maxHeight = 480;
-        // randomPhoto.maxWidth = Math.floor(Math.random()* (120 - 100 +1) + 100)
-        // randomPhoto.maxHeight = Math.floor(Math.random()* (120 - 100 +1) + 100)
+      if (!(this.displayedPhotos.includes(randomPhoto.filename)) && !(randomPhoto === oldPhoto)) {
+        //random Margins in range -70 to 70
+        randomPhoto.marginTop = Math.floor(Math.random()*140-70)
+        randomPhoto.marginLeft = Math.floor(Math.random()*140-70)
+        // ranom MaxDimensions in range 100 to 120
+        randomPhoto.maxWidth = Math.floor(Math.random()* (120 - 100 +1) + 100)
+        randomPhoto.maxHeight = Math.floor(Math.random()* (120 - 100 +1) + 100)
         randomPhoto.zIndex = this.zIndex
         this.zIndex ++
-        this.photoHtmlItems.push({photo: randomPhoto})
+        p.photo = randomPhoto
         this.displayedPhotos.push(randomPhoto.filename)
+        if (oldPhoto) {
+          this.displayedPhotos.splice(this.displayedPhotos.indexOf(oldPhoto.filename), 1)
+        }
+        var replaceIn = Math.floor(Math.random() * (20 - 10 + 1) + 10)
       } else {
-        console.log('no photo that is not displayed');
-        this.addPhoto()
+        replaceIn = 1
       }
-    },
-    addEvery5seconds(){
-      this.addPhoto()
+      // console.log(replaceIn);
       let that = this;
-      setTimeout(() => {
-        that.addEvery5seconds()
-      }, 5000)
+      setTimeout(function () {
+        that.replacePhoto(p)
+      }, replaceIn*1000);
+
     },
     calcDimensions() {
+      this.photoGridItems = [];
       let width = window.innerWidth;
       let height = window.innerHeight;
-      this.maxLeft = width/3*2
-      this.minTop = height/2
+      this.cols = Math.floor(width/480);
+      this.rows = Math.floor(height/480);
+      if (this.cols === 0) {
+        this.cols = 1;
+      }
+      if (this.rows === 0) {
+        this.rows = 1;
+      }
+      for (let col=0; col<this.cols; col ++) {
+        for (let row=0; row<this.rows; row++) {
+          this.photoGridItems.push({photo:null})
+        }
+      }
     }
   },
   mounted() {
@@ -141,7 +154,9 @@ export default {
         this.connectWebSocket()
       })
       .finally(() => {
-        this.addEvery5seconds()
+        this.photoGridItems.forEach((p) => {
+          this.replacePhoto(p)
+        });
       })
   },
   beforeUnmount() {
@@ -182,32 +197,21 @@ export default {
 
   .statsandcontrols {
     z-index: 99999999999999;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    color: white;
     position: fixed;
     bottom: 0;
     right: 0;
-    font-size: 0.8rem;
-    font-family: Abel, sans-serif;
   }
-
-  .photoItem {
-    position: fixed;
-    max-width: 33vw;
-    max-height: 50vh;
-    border: 5px solid white;
-    filter: drop-shadow(0 0 0.3rem white);
-  }
-
-  .photoItemContainer {
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background-color: rgba(0,0,0,0.04);
+  .griditem {
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    position: relative;
+    & img {
+      position: absolute;
+      top: 0;
+      max-width: 100%;
+      max-height: 100%;
+    }
   }
 
   .fade-enter-active,

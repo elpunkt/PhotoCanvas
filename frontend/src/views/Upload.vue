@@ -9,7 +9,7 @@
            :onClick="uploadPhoto"
            :disabled="!fileSelected"
            :style="{minWidth: '300px'}"
-           ><span><span v-if="!fileSelected">&#x1F6A7;---&#x1F6A7;---&#x1F6A7;</span><span v-else><span>und ab dafür!</span> &#x1F470;❤️&#x1F935;</span></span></btn>
+           ><span><span v-if="!fileSelected">&#x1F6A7;---&#x1F6A7;---&#x1F6A7;</span><span v-else>&#x1F389; und ab dafür! &#x1F37E;</span></span></btn>
     </div>
   </centeredDiv>
   <div v-if="isLoading" class="loadingscreen">

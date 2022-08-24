@@ -1,5 +1,5 @@
 <template>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💐</text></svg>">
+  <link rel="icon" :href="`data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${favicon}</text></svg>`">
   <router-view/>
   <NotificationsManager/>
   <div class="credits">
@@ -7,16 +7,23 @@
   </div>
 </template>
 <script>
+import {appName, favicon} from '@/env'
+
 import NotificationsManager from '@/components/NotificationsManager.vue';
 export default {
   components: {
     NotificationsManager
   },
+  data() {
+    return {
+      favicon: favicon
+    }
+  },
   created() {
     this.$store.dispatch('checkLoggedIn')
   },
   mounted() {
-    document.title= 'Merle & Jan';
+    document.title= appName;
   }
 }
 </script>

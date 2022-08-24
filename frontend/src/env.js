@@ -18,3 +18,4 @@ if (env === 'production') {
 export const wsUrl = envWSUrl;
 export const apiUrl = envApiUrl;
 export const appName = process.env.VUE_APP_NAME;
+export const favicon = process.env.VUE_APP_FAVICON_EMOJI;
