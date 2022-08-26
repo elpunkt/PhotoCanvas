@@ -2,11 +2,10 @@ from datetime import timedelta
 import time
 import random
 import math
-from typing import Any
+from typing import Any, List
 
 from PIL import Image, UnidentifiedImageError, ImageOps
 from sqlalchemy.orm import Session
-from typing import List
 
 from fastapi import (APIRouter, HTTPException,
                      UploadFile, Form, BackgroundTasks, Depends)
@@ -19,18 +18,30 @@ from .crud import (photo_get, user_get, user_create, create_photo, get_photos, d
 from .websocket import ws_manager
 api_router = APIRouter()
 
+import asyncio
+import concurrent
+import time
 
-async def process_image(imgin, title, db):
+
+def process_image_non_blocking(imgin, title):
     img = ImageOps.exif_transpose(imgin)
-    img_name = f"{math.floor(time.time())}_{random.randint(10000,99999)}.{img.format}"
+    img_name = f"{math.floor(time.time())}_{random.randint(10000,99999)}.{imgin.format}"
     img.thumbnail((settings.MAX_IMG_WIDTH, settings.MAX_IMG_HEIGHT))
     img.save(f"{settings.IMG_SAVE_PATH}{img_name}",
              quality=settings.IMG_QUALITY,
              optimize=settings.OPTIMIZE_IMGS,
              format=imgin.format)
     photo_meta = {"title":title, "filename": img_name, "upload_date": time.time()}
+    return photo_meta
+
+async def process_image(imgin, title, db):
+    start = time.time()
+    loop = asyncio.get_event_loop()
+    with concurrent.futures.ProcessPoolExecutor() as pool:
+        photo_meta = await loop.run_in_executor(pool, process_image_non_blocking, imgin, title)
     create_photo(db, photo_meta)
     await ws_manager.broadcast_photo_action({'action': 'add', 'photo': photo_meta})
+    print(time.time() - start)
 
 
 @api_router.post("/login/access-token", response_model=Token)
@@ -115,7 +126,7 @@ def delete_user(
 
 
 @api_router.post('/upload', response_model=Message)
-def upload_photo(background_tasks: BackgroundTasks,
+async def upload_photo(background_tasks: BackgroundTasks,
                  photo: UploadFile,
                  title: str = Form(),
                  db: Session = Depends(deps.get_db)):

@@ -1,4 +1,5 @@
-import asyncio
+from typing import List
+
 from websockets.exceptions import ConnectionClosedOK
 
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter
