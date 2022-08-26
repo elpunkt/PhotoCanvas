@@ -4,7 +4,7 @@ import {apiUrl} from '@/env'
 export const apiClient = axios.create({
   // baseURL: 'https://my-json-server.typicode.com/bipinstha7/vue-design-pattern',
   baseURL: apiUrl,
-  timeout: 5000 // throw error if API call takes longer than 10 seconds
+  timeout: 20000 // throw error if API call takes longer than 20 seconds
 });
 
 function authHeaders(token) {
