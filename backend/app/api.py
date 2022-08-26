@@ -2,6 +2,8 @@ from datetime import timedelta
 import time
 import random
 import math
+import asyncio
+import concurrent
 from typing import Any, List
 
 from PIL import Image, UnidentifiedImageError, ImageOps
@@ -18,15 +20,14 @@ from .crud import (photo_get, user_get, user_create, create_photo, get_photos, d
 from .websocket import ws_manager
 api_router = APIRouter()
 
-import asyncio
-import concurrent
-import time
+
 
 
 def process_image_non_blocking(imgin, title):
     img = ImageOps.exif_transpose(imgin)
     img_name = f"{math.floor(time.time())}_{random.randint(10000,99999)}.{imgin.format}"
-    img.thumbnail((settings.MAX_IMG_WIDTH, settings.MAX_IMG_HEIGHT))
+    if img.width > settings.MAX_IMG_WIDTH or img.height > settings.MAX_IMG_HEIGHT:
+        img.thumbnail((settings.MAX_IMG_WIDTH, settings.MAX_IMG_HEIGHT))
     img.save(f"{settings.IMG_SAVE_PATH}{img_name}",
              quality=settings.IMG_QUALITY,
              optimize=settings.OPTIMIZE_IMGS,
@@ -35,13 +36,11 @@ def process_image_non_blocking(imgin, title):
     return photo_meta
 
 async def process_image(imgin, title, db):
-    start = time.time()
     loop = asyncio.get_event_loop()
     with concurrent.futures.ProcessPoolExecutor() as pool:
         photo_meta = await loop.run_in_executor(pool, process_image_non_blocking, imgin, title)
     create_photo(db, photo_meta)
     await ws_manager.broadcast_photo_action({'action': 'add', 'photo': photo_meta})
-    print(time.time() - start)
 
 
 @api_router.post("/login/access-token", response_model=Token)

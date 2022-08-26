@@ -21,6 +21,7 @@
 import {Api} from "@/api/api.js";
 import centeredDiv from '@/components/layout/CenteredDiv'
 import Button from '@/components/Button'
+import {resizeImage} from '@/utils.js'
 
 export default {
   components: {
@@ -37,10 +38,14 @@ export default {
     uploadPhoto() {
       this.isLoading = true
       var promises = Array.from(this.$refs.file.files).map((f) => {
-        return Api.uploadPhoto(f)
-          .then((r) => {
-            this.$store.commit('addNotification', { content: r.data.message, color: r.data.state})
-          })
+        return resizeImage({file: f, maxSize: 1080})
+          .then((resizedImage) => {
+            Api.uploadPhoto(resizedImage)
+              .then((r) => {
+              this.$store.commit('addNotification', { content: r.data.message, color: r.data.state})
+              })
+          }
+        )
       })
       Promise.all(promises).then(() => {
         this.$refs.file.value = null;
