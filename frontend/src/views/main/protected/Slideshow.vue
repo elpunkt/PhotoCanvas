@@ -49,7 +49,8 @@ export default {
       displayedNewPhoto: null,
       readyForNewPhoto: true,
       photoHtmlItems: [],
-      zIndex: 1
+      zIndex: 1,
+      newDrop:undefined,
     }
   },
   watch: {
@@ -72,6 +73,7 @@ export default {
           that.displayedNewPhoto = newList[0]
           setTimeout(() => {
             console.log('first timeout');
+            that.addEveryXseconds(5);
             that.displayedNewPhoto = null;
             setTimeout(() => {
               console.log('inner timeout');
@@ -91,6 +93,7 @@ export default {
       that.socket.onmessage = function(e) {
         let data = JSON.parse(e.data)
         if (data.action === 'add') {
+          // clearTimeout(that.newDrop);
           that.photos.push(data.photo)
           that.newPhotos.push(data.photo)
           // that.$store.commit('addNotification', { content: 'Neues Foto', color: 'success' })
@@ -117,6 +120,7 @@ export default {
       let randomPhoto = notDisplayed[random]
       randomPhoto.left = Math.floor(Math.random()* this.maxLeft)
       randomPhoto.top = Math.floor(Math.random()* this.minTop)
+      randomPhoto.class = undefined
       randomPhoto.transform=(0.5-Math.random())<0?"scale(2.5) rotate(-45deg)":"scale(2.5) rotate(45deg)";
       // randomPhoto.maxWidth = Math.floor(Math.random()* (120 - 100 +1) + 100)
       // randomPhoto.maxHeight = Math.floor(Math.random()* (120 - 100 +1) + 100)
@@ -127,14 +131,14 @@ export default {
       setTimeout(()=>{
         randomPhoto.transform = "scale(1) rotate(" + (-5 + (Math.random() * 10)) + "deg)";
         randomPhoto.class = "added";
-      },100)
+      },500)
     },
     addEveryXseconds(X){
       this.addPhoto()
       let that = this;
-      setTimeout(() => {
+      this.newDrop = setTimeout(() => {
         that.addEveryXseconds(X)
-      }, X * 1000)
+      }, X * 1000);
     },
     calcDimensions() {
       let width = window.innerWidth;
