@@ -18,9 +18,18 @@
     </div>
   </transition>
   <div class="statsandcontrols">
+    {{displayedPhotos.length}}
     <span style="cursor:pointer; font-size:2em;" @click="addPhoto">&#x1F3B2;</span>
     <div> {{photos.length}} Fotos in der Sammlung</div>
     <div v-if="newPhotos.length > 1">{{newPhotos.length - 1}} Neue Fotos in der Warteschlange</div>
+    <!-- <div id="photoSelector">
+        <img class="thumbnail"
+               v-for="p in photos"
+               :src="`/uploaded/${p.filename}`"
+               :key="p.filename"
+               @click="newPhotos.push(p)"
+               :style="[newPhotos.includes(p) ? 'border: 3px solid orange;' : '']">
+    </div> -->
   </div>
 </template>
 
@@ -54,16 +63,19 @@ export default {
 
     newPhotos: {
       handler(oldList, newList) {
-        if (this.readyForNewPhoto) {
+        if ((this.readyForNewPhoto) && (newList.length > 0)) {
+          console.log(this.readyForNewPhoto);
           this.readyForNewPhoto = false;
           let that = this
           that.displayedNewPhoto = newList[0]
           setTimeout(() => {
+            console.log('first timeout');
             that.displayedNewPhoto = null;
             setTimeout(() => {
+              console.log('inner timeout');
               that.readyForNewPhoto = true;
               that.newPhotos.shift()
-            }, 3000);
+            }, 2500);
           }, 6000);
         }
       },
@@ -98,22 +110,17 @@ export default {
       }
     },
     addPhoto() {
-      let random = Math.floor(Math.random() * this.photos.length);
-      let randomPhoto = this.photos[random]
-      if (!(this.displayedPhotos.includes(randomPhoto.filename))) {
-        randomPhoto.left = Math.floor(Math.random()* this.maxLeft)
-        randomPhoto.top = Math.floor(Math.random()* this.minTop)
-        randomPhoto.maxWidth = 480;
-        randomPhoto.maxHeight = 480;
-        // randomPhoto.maxWidth = Math.floor(Math.random()* (120 - 100 +1) + 100)
-        // randomPhoto.maxHeight = Math.floor(Math.random()* (120 - 100 +1) + 100)
-        randomPhoto.zIndex = this.zIndex
-        this.zIndex ++
-        this.photoHtmlItems.push({photo: randomPhoto})
-        this.displayedPhotos.push(randomPhoto.filename)
-      } else {
-        this.addPhoto()
-      }
+      let notDisplayed = this.photos.filter((p) => !(this.displayedPhotos.includes(p.filename)))
+      let random = Math.floor(Math.random() * notDisplayed.length);
+      let randomPhoto = notDisplayed[random]
+      randomPhoto.left = Math.floor(Math.random()* this.maxLeft)
+      randomPhoto.top = Math.floor(Math.random()* this.minTop)
+      // randomPhoto.maxWidth = Math.floor(Math.random()* (120 - 100 +1) + 100)
+      // randomPhoto.maxHeight = Math.floor(Math.random()* (120 - 100 +1) + 100)
+      randomPhoto.zIndex = this.zIndex
+      this.zIndex ++
+      this.photoHtmlItems.push({photo: randomPhoto})
+      this.displayedPhotos.push(randomPhoto.filename)
     },
     addEveryXseconds(X){
       this.addPhoto()
@@ -150,6 +157,20 @@ export default {
 </script>
 
 <style lang="scss">
+#photoSelector {
+    background: black;
+    z-index: 9999999999999999;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 10vw;
+    height: 100vh;
+    overflow-y: scroll;
+    img {
+      max-height: 10vh;
+
+    }
+  }
   #header {
     display: none;
   }
@@ -193,7 +214,7 @@ export default {
 
   .photoItem {
     position: fixed;
-    max-width: 33vw;
+    max-width: 30vw;
     max-height: 50vh;
     border: 5px solid white;
     filter: drop-shadow(0 0 0.3rem white);

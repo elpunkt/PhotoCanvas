@@ -1,6 +1,6 @@
 module.exports = {
   devServer: {
-    hot: false,
-    liveReload: false
+    // hot: false,
+    // liveReload: false
   }
 }
