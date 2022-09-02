@@ -4,11 +4,13 @@
          :key="i.id">
            <img v-if="i.photo"
                 class="photoItem"
+                :class="i.photo.class"
                 :src="`/uploaded/${i.photo.filename}`"
                 :key="i.photo.filename"
                 :style="{left: i.photo.left + 'px',
                          top: i.photo.top + 'px',
-                         zIndex: i.photo.zIndex}">
+                         zIndex: i.photo.zIndex,
+                         transform: i.photo.transform,}">
     </div>
   </div>
   <transition name="fade">
@@ -115,12 +117,17 @@ export default {
       let randomPhoto = notDisplayed[random]
       randomPhoto.left = Math.floor(Math.random()* this.maxLeft)
       randomPhoto.top = Math.floor(Math.random()* this.minTop)
+      randomPhoto.transform=(0.5-Math.random())<0?"scale(2.5) rotate(-45deg)":"scale(2.5) rotate(45deg)";
       // randomPhoto.maxWidth = Math.floor(Math.random()* (120 - 100 +1) + 100)
       // randomPhoto.maxHeight = Math.floor(Math.random()* (120 - 100 +1) + 100)
       randomPhoto.zIndex = this.zIndex
       this.zIndex ++
       this.photoHtmlItems.push({photo: randomPhoto})
       this.displayedPhotos.push(randomPhoto.filename)
+      setTimeout(()=>{
+        randomPhoto.transform = "scale(1) rotate(" + (-5 + (Math.random() * 10)) + "deg)";
+        randomPhoto.class = "added";
+      },100)
     },
     addEveryXseconds(X){
       this.addPhoto()
@@ -218,6 +225,11 @@ export default {
     max-height: 50vh;
     border: 5px solid white;
     filter: drop-shadow(0 0 0.3rem white);
+    transition: all 1s, opacity 2s;
+    opacity: 0;
+  }
+  .photoItem.added {
+    opacity: 1;
   }
 
   .photoItemContainer {
